@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AddInvoiceModal from "./components/AddInvoiceModal";
 import FilterBar from "./components/FilterBar";
 import InvoiceTable from "./components/InvoiceTable";
 import MarkPaidModal from "./components/MarkPaidModal";
+import PaginationControls from "./components/PaginationControls";
 import SummaryCard from "./components/SummaryCard";
 import { useInvoices } from "./hooks";
 import { formatCurrency } from "./utils";
@@ -47,6 +48,8 @@ function App() {
   const [sortBy, setSortBy] = useState("dueDate");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [activeInvoice, setActiveInvoice] = useState(null);
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredInvoices = useMemo(() => {
     const search = searchQuery.trim().toLowerCase();
@@ -63,6 +66,24 @@ function App() {
       : statusFiltered;
     return sortInvoices(searched, sortBy);
   }, [invoices, searchQuery, sortBy, statusFilter]);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredInvoices.length / pageSize)),
+    [filteredInvoices.length, pageSize]
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, searchQuery, sortBy, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
+
+  const pagedInvoices = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredInvoices.slice(start, start + pageSize);
+  }, [currentPage, filteredInvoices, pageSize]);
 
   const summary = useMemo(() => {
     const todayMonth = getMonthKey(new Date());
@@ -104,6 +125,39 @@ function App() {
       avgDelay: paidDelayCount ? paidDelayTotal / paidDelayCount : 0,
     };
   }, [filteredInvoices]);
+
+  const handleStatusChange = useCallback((value) => {
+    setStatusFilter(value);
+  }, []);
+
+  const handleSearchChange = useCallback((value) => {
+    setSearchQuery(value);
+  }, []);
+
+  const handleSortChange = useCallback((value) => {
+    setSortBy(value);
+  }, []);
+
+  const handleMarkPaid = useCallback((invoice) => {
+    setActiveInvoice(invoice);
+  }, []);
+
+  const handleAddInvoice = useCallback(
+    (payload) => {
+      addInvoice(payload);
+      setCurrentPage(1);
+    },
+    [addInvoice]
+  );
+
+  const handlePaymentConfirm = useCallback(
+    (paymentDate) => {
+      if (activeInvoice) {
+        markPaid(activeInvoice.id, paymentDate);
+      }
+    },
+    [activeInvoice, markPaid]
+  );
 
   return (
     <div className="min-h-screen px-6 py-10">
@@ -157,15 +211,22 @@ function App() {
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <FilterBar
             statusFilter={statusFilter}
-            onStatusChange={setStatusFilter}
+            onStatusChange={handleStatusChange}
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={handleSearchChange}
             sortBy={sortBy}
-            onSortChange={setSortBy}
+            onSortChange={handleSortChange}
           />
           <InvoiceTable
-            invoices={filteredInvoices}
-            onMarkPaid={(invoice) => setActiveInvoice(invoice)}
+            invoices={pagedInvoices}
+            onMarkPaid={handleMarkPaid}
+          />
+          <PaginationControls
+            currentPage={currentPage}
+            totalItems={filteredInvoices.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
           />
         </section>
       </main>
@@ -173,17 +234,13 @@ function App() {
       <AddInvoiceModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onSubmit={addInvoice}
+        onSubmit={handleAddInvoice}
       />
       <MarkPaidModal
         isOpen={Boolean(activeInvoice)}
         invoice={activeInvoice}
         onClose={() => setActiveInvoice(null)}
-        onConfirm={(paymentDate) => {
-          if (activeInvoice) {
-            markPaid(activeInvoice.id, paymentDate);
-          }
-        }}
+        onConfirm={handlePaymentConfirm}
       />
     </div>
   );
