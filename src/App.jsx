@@ -208,7 +208,7 @@ function App() {
           />
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm backdrop-blur">
           <FilterBar
             statusFilter={statusFilter}
             onStatusChange={handleStatusChange}

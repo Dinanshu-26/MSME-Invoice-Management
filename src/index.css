@@ -11,5 +11,14 @@
 body {
   margin: 0;
   background-color: rgb(var(--surface));
+  background-image: radial-gradient(
+      circle at top,
+      rgba(226, 232, 240, 0.9),
+      rgba(248, 250, 252, 0.2) 45%,
+      rgba(248, 250, 252, 0)
+    ),
+    linear-gradient(120deg, rgba(241, 245, 249, 0.9), rgba(255, 255, 255, 0));
+  font-family: "Avenir Next", "Avenir", "Nimbus Sans", "Helvetica Neue",
+    sans-serif;
   color: rgb(var(--ink));
 }

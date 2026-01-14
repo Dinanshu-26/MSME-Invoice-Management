@@ -8,7 +8,7 @@ const SummaryCard = ({ label, value, helper, tone = "default" }) => (
   <div
     className={`rounded-2xl border bg-white p-4 shadow-sm ${
       toneStyles[tone] || toneStyles.default
-    }`}
+    } transition duration-200 hover:-translate-y-0.5 hover:shadow-md`}
   >
     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
       {label}
