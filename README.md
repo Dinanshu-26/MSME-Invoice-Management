@@ -3,7 +3,7 @@
 React + Tailwind dashboard for MSMEs to track invoices, payments, and cash flow.
 
 ## Live Demo
-- URL: [Add deployment link]
+- URL: https://msme-invoice-management.vercel.app/
 
 ## Features
 - Invoice list with status filter, search, and sorting
@@ -38,15 +38,11 @@ npm start
 - Simple date handling with native Date (no external libs).
 
 ## Time Breakdown
-- Design & Planning: X hours
-- Development: X hours
-- Testing & Debugging: X hours
-- Total: X hours
+- Design & Planning ~ 2 hours
+- Development ~ 10 hours
+- Testing & Debugging ~ 2 hours
+- Total ~ 14 hours
 
 ## Deployment
 - Build: `npm run build`
 - Deploy to Netlify/Vercel/GitHub Pages.
-
-## Submission Notes
-- Repo: [Add repo link]
-- Live URL: [Add deployment link]
